@@ -8,10 +8,31 @@ const subjectsRouter = Router();
 // Get All Subjects with Optional Search, Filtering, and Pagination
 subjectsRouter.get("/", async (req, res) => {
   try {
-    const { search, department, page = 1, limit = 10 } = req.query;
+    // const { search, department, page = 1, limit = 10 } = req.query;
+    // const currentPage = Math.max(1, +page);
+    // const limitPerPage = Math.max(1, +limit);
 
-    const currentPage = Math.max(1, +page);
-    const limitPerPage = Math.max(1, +limit);
+    const { search, department, page = "1", limit = "10" } = req.query;
+    const MAX_LIMIT = 100;
+
+    const parsedPage =
+      typeof page === "string"
+        ? Number(page)
+        : Number(Array.isArray(page) ? page[0] : NaN);
+    const parsedLimit =
+      typeof limit === "string"
+        ? Number(limit)
+        : Number(Array.isArray(limit) ? limit[0] : NaN);
+
+    const currentPage =
+      Number.isFinite(parsedPage) && parsedPage > 0
+        ? Math.floor(parsedPage)
+        : 1;
+    const limitPerPage =
+      Number.isFinite(parsedLimit) && parsedLimit > 0
+        ? Math.min(MAX_LIMIT, Math.floor(parsedLimit))
+        : 10;
+
     const offset = (currentPage - 1) * limitPerPage;
 
     const filterConditions = [];
@@ -28,7 +49,18 @@ subjectsRouter.get("/", async (req, res) => {
 
     // If Department Exists => Filter By Department Name
     if (department) {
-      filterConditions.push(ilike(departments.name, `%${department}%`));
+      const departmentValue =
+        typeof department === "string"
+          ? department
+          : Array.isArray(department)
+            ? typeof department[0] === "string"
+              ? department[0]
+              : ""
+            : "";
+
+      // Escape Special Characters in Department Value to Prevent SQL Injection
+      const escapedDepartment = departmentValue.replace(/[%_\\]/g, "\\$1");
+      filterConditions.push(ilike(departments.name, `%${escapedDepartment}%`));
     }
 
     // Combine All Filters
@@ -60,9 +92,9 @@ subjectsRouter.get("/", async (req, res) => {
       data: subjectsList,
       pagination: {
         page: currentPage,
+        totalPages: Math.ceil(totalCount / limitPerPage),
         limit: limitPerPage,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limitPerPage),
       },
     });
   } catch (error) {

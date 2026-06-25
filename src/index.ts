@@ -1,20 +1,25 @@
+import "dotenv/config";
 import express, { Request, Response } from "express";
 import subjectsRouter from "./routes/subjects";
+import helmet from "helmet";
 import cors from "cors";
-import "dotenv/config";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-// Application Middlewares:
+const FRONTEND_URL = process.env.FRONTEND_URL;
+if (!FRONTEND_URL)
+  throw new Error("FRONTEND_URL environment variable is required");
 
+// Application Middlewares:
 // Parse JSON request bodies
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   // Enable Cors To Access Data in The Frontend
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   }),
