@@ -6,11 +6,16 @@ import errorHandler from "./middleware/errorHandler";
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT ? Number(process.env.PORT) : 8000;
-
 if (!process.env.FRONTEND_URL)
   throw new Error("FRONTEND_URL is not defined in the environment variables.");
+else if (!process.env.PORT) {
+  console.warn(
+    "PORT is not defined in the environment variables. Defaulting to 8000.",
+  );
+}
+
+const app = express();
+const PORT = process.env.PORT ? Number(process.env.PORT) : 8000;
 
 // Application Middlewares
 app.use(express.json());
