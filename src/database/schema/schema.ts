@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm/_relations";
+import { defineRelations } from "drizzle-orm";
 import { integer, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 
 const timeStamps = {
@@ -28,18 +28,23 @@ export const subjects = pgTable("subjects", {
   ...timeStamps,
 });
 
-// One department has many subjects
-export const departmentRelations = relations(departments, ({ many }) => ({
-  subjects: many(subjects),
-}));
-
-// One subject belongs to one department
-export const subjectRelations = relations(subjects, ({ one }) => ({
-  department: one(departments, {
-    fields: [subjects.departmentId], // FK on subjects table
-    references: [departments.id], // PK on departments table
+export const relations = defineRelations(
+  { departments, subjects },
+  (helpers) => ({
+    departments: {
+      subjects: helpers.many.subjects({
+        from: [helpers.departments.id],
+        to: [helpers.subjects.departmentId],
+      }),
+    },
+    subjects: {
+      department: helpers.one.departments({
+        from: [helpers.subjects.departmentId],
+        to: [helpers.departments.id],
+      }),
+    },
   }),
-}));
+);
 
 export const Department = typeof departments.$inferSelect;
 export const NewDepartment = typeof departments.$inferInsert;
