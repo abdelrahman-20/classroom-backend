@@ -1,6 +1,9 @@
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
+
 import subjectsRouter from "./routes/subjectsRoutes";
 import errorHandler from "./middleware/errorHandler";
 
@@ -28,6 +31,7 @@ app.use(
   }),
 );
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/subjects", subjectsRouter);
 
 app.get("/", (req, res) => {

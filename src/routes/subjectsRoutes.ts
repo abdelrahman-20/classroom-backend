@@ -1,85 +1,107 @@
 import express from "express";
-import { and, desc, eq, getColumns, ilike, or, sql } from "drizzle-orm";
-import { departments, subjects } from "../database/schema/schema";
-import db from "../database";
+import { getAllSubjects } from "../controllers/subjectsControllers";
 
 const subjectsRouter = express.Router();
 
-// Escape user input for SQL LIKE/ILIKE patterns to reduce injection/abuse risk
-const escapeLike = (input: string) => input.replace(/([%_\\])/g, "\\$1");
-
-subjectsRouter.get("/", async (req: express.Request, res: express.Response) => {
-  try {
-    const { search, department, page = 1, limit = 10 } = req.query;
-
-    // Pagination & Offset
-    const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
-    const limitPerPage = Math.min(100, parseInt(String(limit), 10) || 10);
-    const offset = (currentPage - 1) * limitPerPage;
-
-    // Filtering (safe)
-    const filterConditions: any[] = [];
-
-    if (search) {
-      const s = escapeLike(String(search));
-      filterConditions.push(
-        or(ilike(subjects.code, `%${s}%`), ilike(subjects.name, `%${s}%`)),
-      );
-    }
-
-    if (department) {
-      const dept = String(department).trim();
-      const d = escapeLike(dept);
-      filterConditions.push(ilike(departments.name, `%${d}%`));
-
-      // const dept = String(department).trim();
-      // // Prefer exact numeric department id matching when a number is provided
-      // if (/^\d+$/.test(dept)) {
-      //   filterConditions.push(eq(departments.id, Number(dept)));
-      // } else {
-      //   const d = escapeLike(dept);
-      //   filterConditions.push(ilike(departments.name, `%${d}%`));
-      // }
-    }
-
-    const whereClauses =
-      filterConditions.length > 0 ? and(...filterConditions) : undefined;
-
-    const countResults = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(subjects)
-      .leftJoin(departments, eq(subjects.departmentId, departments.id))
-      .where(whereClauses);
-
-    const totalCount = countResults[0]?.count ?? 0;
-
-    const subjectsList = await db
-      .select({
-        ...getColumns(subjects),
-        department: {
-          ...getColumns(departments),
-        },
-      })
-      .from(subjects)
-      .leftJoin(departments, eq(subjects.departmentId, departments.id))
-      .where(whereClauses)
-      .limit(limitPerPage)
-      .offset(offset)
-      .orderBy(desc(subjects.createdAt));
-
-    res.status(200).json({
-      data: subjectsList,
-      pagination: {
-        page: currentPage,
-        limit: limitPerPage,
-        total: totalCount,
-        totalPages: Math.ceil(totalCount / limitPerPage),
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: String(error) });
-  }
-});
+/**
+ * @swagger
+ * /api/subjects:
+ *   get:
+ *     summary: Get paginated subjects with optional filters
+ *     tags: [Subjects]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Search by subject code or name
+ *       - in: query
+ *         name: department
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter by department name or department ID
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         required: false
+ *         description: Current page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *         required: false
+ *         description: Number of items per page
+ *     responses:
+ *       200:
+ *         description: Paginated list of subjects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       code:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                         nullable: true
+ *                       departmentId:
+ *                         type: integer
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       department:
+ *                         type: object
+ *                         nullable: true
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           name:
+ *                             type: string
+ *                           code:
+ *                             type: string
+ *                           description:
+ *                             type: string
+ *                             nullable: true
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     total:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *       500:
+ *         description: Internal server error
+ */
+subjectsRouter.get("/", getAllSubjects);
 
 export default subjectsRouter;
