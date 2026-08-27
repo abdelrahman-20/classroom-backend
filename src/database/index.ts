@@ -2,11 +2,15 @@ import "dotenv/config";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { relations } from "./schema/schema";
+import { authRelations } from "./schema/auth";
 
 if (!process.env.DATABASE_URL)
   throw new Error(`Database URL Wasn't Provided !!`);
 
 const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle({ client: sql, relations });
+const db = drizzle({
+  client: sql,
+  relations: { ...relations, ...authRelations },
+});
 
 export default db;

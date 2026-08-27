@@ -25,6 +25,7 @@
   "homepage": "https://github.com/abdelrahman-20/classroom-backend#readme",
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
+    "better-auth": "^1.7.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^1.0.0-rc.4",
