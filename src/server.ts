@@ -6,6 +6,7 @@ import { swaggerSpec } from "./config/swagger";
 
 import subjectsRouter from "./routes/subjectsRoutes";
 import errorHandler from "./middleware/errorHandler";
+import securityMiddleware from "./middleware/security";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use(
     credentials: true,
   }),
 );
+app.use(securityMiddleware);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/subjects", subjectsRouter);
