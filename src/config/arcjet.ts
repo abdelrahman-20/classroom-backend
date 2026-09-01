@@ -1,8 +1,13 @@
 import arcjet, { detectBot, shield, slidingWindow } from "@arcjet/node";
 
-if (!process.env.ARCJET_KEY) throw Error("ARCJET_KEY must be provided.");
+let aj: ReturnType<typeof arcjet> | null = null;
 
-const aj = arcjet({
+function getArcjetClient() {
+  if (!aj) {
+    if (!process.env.ARCJET_KEY) {
+      throw Error("ARCJET_KEY must be provided.");
+    }
+    aj = arcjet({
   // Get your site key from https://console.arcjet.com and set it as an environment
   // variable rather than hard coding.
   key: process.env.ARCJET_KEY!,
@@ -29,6 +34,10 @@ const aj = arcjet({
       max: 100,
     }),
   ],
-});
+  proxies: process.env.ARCJET_PROXIES?.split(",").map((p) => p.trim()) || [],
+    });
+  }
+  return aj;
+}
 
-export default aj;
+export default getArcjetClient();

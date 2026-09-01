@@ -8,7 +8,7 @@ const securityMiddleware = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (process.env.NODE_ENV === "test") next();
+  if (process.env.NODE_ENV === "test") return next();
 
   try {
     const role: RateLimitRole = req.user?.role ?? "guest";
@@ -46,9 +46,6 @@ const securityMiddleware = async (
       headers: req.headers,
       method: req.method,
       url: req.originalUrl ?? req.url,
-      socket: {
-        remoteAddress: req.socket.remoteAddress ?? req.ip ?? "0.0.0.0",
-      },
     };
 
     const decision = await client.protect(arcjetRequest);
