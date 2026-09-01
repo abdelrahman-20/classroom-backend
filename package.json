@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/abdelrahman-20/classroom-backend#readme",
   "dependencies": {
+    "@arcjet/inspect": "^1.11.0",
+    "@arcjet/node": "^1.11.0",
     "@neondatabase/serverless": "^1.1.0",
     "better-auth": "^1.7.2",
     "cors": "^2.8.6",
