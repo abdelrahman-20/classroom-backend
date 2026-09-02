@@ -6,7 +6,7 @@ function errorHandler(
   res: Response,
   next: NextFunction,
 ) {
-  console.log(err);
+  console.error(err);
 
   const status =
     err?.status && Number(err.status) >= 400 ? Number(err.status) : 500;

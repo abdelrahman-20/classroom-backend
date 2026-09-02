@@ -9,7 +9,12 @@ if (!process.env.BETTER_AUTH_SECRET)
 
 const trustedOrigins = [process.env.FRONTEND_URL];
 if (process.env.NODE_ENV !== "production") {
-  trustedOrigins.push("http://localhost:3000", "http://localhost:5173");
+  trustedOrigins.push(
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+  );
 }
 
 export const auth = betterAuth({
@@ -28,7 +33,7 @@ export const auth = betterAuth({
         type: ["student", "teacher", "admin"],
         required: true,
         defaultValue: "student",
-        input: true,
+        input: false,
       },
       imageCldPubId: {
         type: "string",

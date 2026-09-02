@@ -42,9 +42,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Authentication Middleware "Better-Auth"
-app.all("/api/auth/{*any}", toNodeHandler(auth));
-
 // Additional Middlewares
 app.use(express.json());
 app.use(
@@ -61,6 +58,9 @@ app.use(
     credentials: true,
   }),
 );
+
+// Authentication Middleware "Better-Auth"
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 // Security Middleware "ArcJet"
 app.use(securityMiddleware);
