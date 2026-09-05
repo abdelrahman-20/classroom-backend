@@ -5,11 +5,13 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
 
 import subjectsRouter from "./routes/subjectsRoutes";
+import usersRouter from "./routes/usersRouters";
 import errorHandler from "./middleware/errorHandler";
 import securityMiddleware from "./middleware/security";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import AgentAPI from "apminsight";
+import classRouter from "./routes/classesRouters";
 
 AgentAPI.config();
 dotenv.config();
@@ -69,6 +71,8 @@ app.use(securityMiddleware);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/subjects", subjectsRouter);
+app.use("/api/classes", classRouter);
+app.use("/api/users", usersRouter);
 
 app.get("/", (req, res) => {
   res.json({ status: `Success`, message: `Welcome To Our Web Application` });
