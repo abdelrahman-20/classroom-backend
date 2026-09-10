@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import {
   aliasedTable,
   and,
@@ -10,7 +10,8 @@ import {
   sql,
 } from "drizzle-orm";
 import db from "../database";
-import { classes, subjects, user } from "../database/schema";
+import { classes, departments, subjects, user } from "../database/schema";
+
 const escapeLike = (input: string) => input.replace(/([%_\\])/g, "\\$1");
 
 export const getAllClasses = async (req: Request, res: Response) => {
@@ -86,6 +87,37 @@ export const getAllClasses = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ error: String(error) });
   }
+};
+
+export const getClassDetails = async (req: Request, res: Response) => {
+  const classID = Number(req.params.id);
+
+  if (!Number.isFinite(classID))
+    return res.status(400).json({
+      error: "Class Not Found",
+    });
+
+  const [classDetails] = await db
+    .select({
+      ...getColumns(classes),
+      subject: { ...getColumns(subjects) },
+      department: { ...getColumns(departments) },
+      teacher: { ...getColumns(user) },
+    })
+    .from(classes)
+    .leftJoin(subjects, eq(classes.subjectId, subjects.id))
+    .leftJoin(user, eq(classes.teacherId, user.id))
+    .leftJoin(departments, eq(subjects.departmentId, departments.id))
+    .where(eq(classes.id, classID));
+
+  if (!classDetails)
+    return res
+      .status(404)
+      .json({ error: `Class with ID: ${classID} Not Found !!` });
+
+  // console.log(classDetails);
+
+  res.status(200).json({ data: classDetails });
 };
 
 export const createClass = async (req: Request, res: Response) => {

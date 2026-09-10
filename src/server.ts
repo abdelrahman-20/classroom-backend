@@ -3,15 +3,15 @@ import dotenv from "dotenv";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
-
-import subjectsRouter from "./routes/subjectsRoutes";
-import usersRouter from "./routes/usersRouters";
+import subjectsRouter from "./routes/subjects";
+import usersRouter from "./routes/users";
 import errorHandler from "./middleware/errorHandler";
 import securityMiddleware from "./middleware/security";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import AgentAPI from "apminsight";
-import classRouter from "./routes/classesRouters";
+import classRouter from "./routes/classes";
+import departmentsRouter from "./routes/departments";
 
 AgentAPI.config();
 dotenv.config();
@@ -71,6 +71,7 @@ app.use(securityMiddleware);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/subjects", subjectsRouter);
+app.use("/api/departments", departmentsRouter);
 app.use("/api/classes", classRouter);
 app.use("/api/users", usersRouter);
 
