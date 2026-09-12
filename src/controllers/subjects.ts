@@ -107,8 +107,10 @@ export const createSubject = async (req: Request, res: Response) => {
 };
 
 export const updateSubject = async (req: Request, res: Response) => {
-  if (req.user?.role !== "admin") {
-    return res.status(403).json({ error: "Only admins can update subjects" });
+  if (req.user?.role !== "admin" && req.user?.role !== "teacher") {
+    return res
+      .status(403)
+      .json({ error: "Only admins and teachers can update subjects" });
   }
 
   const id = Number(req.params.id);

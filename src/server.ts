@@ -1,5 +1,6 @@
+import "dotenv/config";
+
 import cors from "cors";
-import dotenv from "dotenv";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
@@ -18,7 +19,6 @@ import searchRouter from "./routes/search";
 import enrollmentsRouter from "./routes/enrollments";
 
 AgentAPI.config();
-dotenv.config();
 
 if (!process.env.FRONTEND_URL)
   throw new Error("FRONTEND_URL is not defined in the environment variables.");
