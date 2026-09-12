@@ -62,17 +62,19 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  if (
-    req.user?.role !== "admin" &&
-    req.user?.id !== id
-  ) {
+  // Validate ID is a string
+  if (typeof id !== "string") {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+
+  if (req.user?.role !== "admin" && req.user?.id !== id) {
     return res.status(403).json({ error: "Insufficient permissions" });
   }
 
   const [found] = await db
     .select({ ...getColumns(user) })
     .from(user)
-    .where(eq(user.id, id));
+    .where(sql`${user.id} = ${id}`);
 
   if (!found) {
     return res.status(404).json({ error: "User not found" });
@@ -120,13 +122,23 @@ export const createUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
+  // Validate ID is a string
+  if (typeof id !== "string") {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+
   if (req.user?.role !== "admin" && req.user?.id !== id) {
     return res.status(403).json({ error: "Insufficient permissions" });
   }
 
   try {
     const { name, email, role, image, imageCldPubId } = req.body;
-    const updateData: Record<string, unknown> = { name, email, image, imageCldPubId };
+    const updateData: Record<string, unknown> = {
+      name,
+      email,
+      image,
+      imageCldPubId,
+    };
 
     // Only admin can change roles
     if (req.user?.role === "admin" && role) {
@@ -136,7 +148,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const [updated] = await db
       .update(user)
       .set(updateData)
-      .where(eq(user.id, id))
+      .where(sql`${user.id} = ${id}`)
       .returning();
 
     if (!updated) {
@@ -164,6 +176,11 @@ export const deleteUser = async (req: Request, res: Response) => {
 
   const { id } = req.params;
 
+  // Validate ID is a string
+  if (typeof id !== "string") {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+
   if (req.user.id === id) {
     return res.status(409).json({ error: "Cannot delete your own account" });
   }
@@ -171,7 +188,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   const [classCount] = await db
     .select({ count: sql<number>`count(*)` })
     .from(classes)
-    .where(eq(classes.teacherId, id));
+    .where(sql`${classes.teacherId} = ${id}`);
 
   if ((classCount?.count ?? 0) > 0) {
     return res.status(409).json({
@@ -180,7 +197,10 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
   }
 
-  const [deleted] = await db.delete(user).where(eq(user.id, id)).returning();
+  const [deleted] = await db
+    .delete(user)
+    .where(sql`${user.id} = ${id}`)
+    .returning();
 
   if (!deleted) {
     return res.status(404).json({ error: "User not found" });
