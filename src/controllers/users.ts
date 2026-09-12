@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { and, desc, eq, getColumns, ilike, or, sql } from "drizzle-orm";
-import { user } from "../database/schema/auth";
+import { NewUser, user } from "../database/schema/auth";
 import db from "../database";
 import { Request, Response } from "express";
 import { classes } from "../database/schema";
@@ -74,7 +74,7 @@ export const getUserById = async (req: Request, res: Response) => {
   const [found] = await db
     .select({ ...getColumns(user) })
     .from(user)
-    .where(sql`${user.id} = ${id}`);
+    .where(eq(user.id, id));
 
   if (!found) {
     return res.status(404).json({ error: "User not found" });
@@ -133,7 +133,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
   try {
     const { name, email, role, image, imageCldPubId } = req.body;
-    const updateData: Record<string, unknown> = {
+    const updateData: Partial<NewUser> = {
       name,
       email,
       image,
@@ -148,7 +148,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const [updated] = await db
       .update(user)
       .set(updateData)
-      .where(sql`${user.id} = ${id}`)
+      .where(eq(user.id, id))
       .returning();
 
     if (!updated) {
@@ -188,7 +188,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   const [classCount] = await db
     .select({ count: sql<number>`count(*)` })
     .from(classes)
-    .where(sql`${classes.teacherId} = ${id}`);
+    .where(eq(classes.teacherId, id));
 
   if ((classCount?.count ?? 0) > 0) {
     return res.status(409).json({
@@ -197,10 +197,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
   }
 
-  const [deleted] = await db
-    .delete(user)
-    .where(sql`${user.id} = ${id}`)
-    .returning();
+  const [deleted] = await db.delete(user).where(eq(user.id, id)).returning();
 
   if (!deleted) {
     return res.status(404).json({ error: "User not found" });
