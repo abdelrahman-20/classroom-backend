@@ -73,6 +73,16 @@ export const classes = pgTable(
   ],
 );
 
+export const activityLogs = pgTable("activity_logs", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  actorId: text("actor_id").references(() => user.id, { onDelete: "set null" }),
+  action: varchar("action", { length: 50 }).notNull(),
+  entityType: varchar("entity_type", { length: 50 }).notNull(),
+  entityId: text("entity_id").notNull(),
+  metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const enrollments = pgTable(
   "enrollments",
   {
@@ -83,6 +93,7 @@ export const enrollments = pgTable(
     classId: integer("class_id")
       .notNull()
       .references(() => classes.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     uniqueIndex("enrollments_studentId_classId_uidx").on(
@@ -95,7 +106,7 @@ export const enrollments = pgTable(
 );
 
 export const relations = defineRelationsPart(
-  { departments, subjects, classes, enrollments, user },
+  { departments, subjects, classes, enrollments, activityLogs, user },
   (helpers) => ({
     departments: {
       subjects: helpers.many.subjects({
@@ -137,6 +148,12 @@ export const relations = defineRelationsPart(
         to: [helpers.classes.id],
       }),
     },
+    activityLogs: {
+      actor: helpers.one.user({
+        from: [helpers.activityLogs.actorId],
+        to: [helpers.user.id],
+      }),
+    },
   }),
 );
 
@@ -151,3 +168,6 @@ export const NewClass = typeof classes.$inferInsert;
 
 export const Enrollment = typeof enrollments.$inferSelect;
 export const NewEnrollment = typeof enrollments.$inferInsert;
+
+export const ActivityLog = typeof activityLogs.$inferSelect;
+export const NewActivityLog = typeof activityLogs.$inferInsert;

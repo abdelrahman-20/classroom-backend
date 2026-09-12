@@ -1,0 +1,2 @@
+-- The activity_logs table, its foreign key, and enrollments.created_at were
+-- already applied by 20260912090411_vengeful_blazing_skull.

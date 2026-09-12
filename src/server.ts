@@ -6,12 +6,16 @@ import { swaggerSpec } from "./config/swagger";
 import subjectsRouter from "./routes/subjects";
 import usersRouter from "./routes/users";
 import errorHandler from "./middleware/errorHandler";
+import { attachSession, requireAuth } from "./middleware/auth";
 import securityMiddleware from "./middleware/security";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import AgentAPI from "apminsight";
 import classRouter from "./routes/classes";
+import dashboardRouter from "./routes/dashboard";
 import departmentsRouter from "./routes/departments";
+import searchRouter from "./routes/search";
+import enrollmentsRouter from "./routes/enrollments";
 
 AgentAPI.config();
 dotenv.config();
@@ -69,11 +73,19 @@ app.all("/api/auth/{*any}", toNodeHandler(auth));
 // Security Middleware "ArcJet"
 app.use(securityMiddleware);
 
+// Attach session to all requests (optional auth)
+app.use(attachSession);
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use("/api/subjects", subjectsRouter);
-app.use("/api/departments", departmentsRouter);
-app.use("/api/classes", classRouter);
-app.use("/api/users", usersRouter);
+
+// Protected API routes
+app.use("/api/subjects", requireAuth, subjectsRouter);
+app.use("/api/departments", requireAuth, departmentsRouter);
+app.use("/api/classes", requireAuth, classRouter);
+app.use("/api/users", requireAuth, usersRouter);
+app.use("/api/dashboard", requireAuth, dashboardRouter);
+app.use("/api/search", requireAuth, searchRouter);
+app.use("/api/enrollments", requireAuth, enrollmentsRouter);
 
 app.get("/", (req, res) => {
   res.json({ status: `Success`, message: `Welcome To Our Web Application` });
