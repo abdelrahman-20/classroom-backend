@@ -32,14 +32,16 @@ const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8000;
 
 // Configure CORS
-const corsOrigins = [process.env.FRONTEND_URL];
+const corsOrigins = [
+  process.env.FRONTEND_URL,
+  "https://classroom-frontend-one-iota.vercel.app",
+];
 if (process.env.NODE_ENV !== "production") {
   corsOrigins.push(
     "http://localhost:3000",
     "http://localhost:5173",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
-    "https://classroom-frontend-one-iota.vercel.app/login",
   );
 }
 

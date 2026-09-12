@@ -27,7 +27,10 @@ const socialProviders = {
     : {}),
 };
 
-const trustedOrigins = [process.env.FRONTEND_URL];
+const trustedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://classroom-frontend-one-iota.vercel.app",
+];
 if (process.env.NODE_ENV !== "production") {
   trustedOrigins.push(
     "http://localhost:3000",
