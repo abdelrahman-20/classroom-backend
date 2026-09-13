@@ -36,6 +36,7 @@ const corsOrigins = [
   process.env.FRONTEND_URL,
   "https://classroom-frontend-one-iota.vercel.app",
 ];
+
 if (process.env.NODE_ENV !== "production") {
   corsOrigins.push(
     "http://localhost:3000",
@@ -76,9 +77,10 @@ app.all("/api/auth/{*any}", toNodeHandler(auth));
 // Security Middleware "ArcJet"
 app.use(securityMiddleware);
 
-// Attach session to all requests (optional auth)
+// Attach session to all requests (optional auth) - For Authorization
 app.use(attachSession);
 
+// API Documentation Route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Protected API routes

@@ -23,6 +23,7 @@ export const attachSession = async (
     }
   } catch {
     // Unauthenticated requests continue without req.user
+    // Throwing No Error => Will allow public routes to be processed
   }
 
   next();
@@ -34,7 +35,7 @@ export const requireAuth = (
   next: NextFunction,
 ) => {
   if (!req.user?.id) {
-    return res.status(401).json({ error: "Authentication required" });
+    return res.status(401).json({ error: "Authentication required !!" });
   }
   next();
 };
@@ -43,11 +44,13 @@ export const requireRole =
   (...roles: UserRole[]) =>
   (req: Request, res: Response, next: NextFunction) => {
     if (!req.user?.id) {
-      return res.status(401).json({ error: "Authentication required" });
+      return res.status(401).json({ error: "Authentication required !!" });
     }
 
     if (!req.user.role || !roles.includes(req.user.role)) {
-      return res.status(403).json({ error: "Insufficient permissions" });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized, Insufficient permissions !!" });
     }
 
     next();

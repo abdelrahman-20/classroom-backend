@@ -4,6 +4,7 @@ import db from "../database";
 import * as schema from "../database/schema";
 
 if (!process.env.FRONTEND_URL) throw new Error("FRONTEND_URL must be provided");
+
 if (!process.env.BETTER_AUTH_SECRET)
   throw new Error("BETTER_AUTH_SECRET must be provided");
 
@@ -30,6 +31,7 @@ const trustedOrigins = [
   process.env.FRONTEND_URL,
   "https://classroom-frontend-one-iota.vercel.app",
 ];
+
 if (process.env.NODE_ENV !== "production") {
   trustedOrigins.push(
     "http://localhost:3000",
@@ -72,7 +74,7 @@ export const auth = betterAuth({
     },
     cookies: {
       session_token: {
-        name: "authentication_token",
+        name: "auth_token",
       },
     },
   },

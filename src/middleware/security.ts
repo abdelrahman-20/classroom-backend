@@ -16,21 +16,21 @@ const securityMiddleware = async (
 
     switch (role) {
       case "admin":
-        limit = 30;
+        limit = 100;
         message =
-          "Admin Request Limit Exceeded (20 Requests Per Minute), Slow Down!";
+          "Admin Request Limit Exceeded (100 Requests Per Minute), Slow Down!";
         break;
 
       case "teacher":
       case "student":
-        limit = 20;
-        message = "Request Limit Exceeded (10 Requests Per Minute), Slow Down!";
+        limit = 50;
+        message = "Request Limit Exceeded (50 Requests Per Minute), Slow Down!";
         break;
 
       default:
         limit = 10;
         message =
-          "Request Limit Exceeded (5 Requests Per Minute), Please Sign-Up For Higher Limits";
+          "Request Limit Exceeded (10 Requests Per Minute), Please Sign-Up For Higher Limits";
         break;
     }
 
@@ -73,7 +73,7 @@ const securityMiddleware = async (
 
     next();
   } catch (error) {
-    console.error("Arcjet Middleware Error: ", error);
+    console.error("ArcJet Middleware Error: ", error);
     res.status(500).json({
       error: "Internal Server Error",
       message: "Something Went Wrong With The Security Middleware.",
