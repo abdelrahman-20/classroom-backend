@@ -2,7 +2,6 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "../database";
 import * as schema from "../database/schema";
-import { setSessionCookie } from "better-auth/cookies";
 
 if (!process.env.FRONTEND_URL) throw new Error("FRONTEND_URL must be provided");
 if (!process.env.BETTER_AUTH_SECRET)
@@ -67,6 +66,10 @@ export const auth = betterAuth({
     },
   },
   advanced: {
+    defaultCookieAttributes: {
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+    },
     cookies: {
       session_token: {
         name: "authentication_token",
