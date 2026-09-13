@@ -75,10 +75,9 @@ app.use(
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 // Security Middleware "ArcJet"
-app.use(securityMiddleware);
-
 // Attach session to all requests (optional auth) - For Authorization
 app.use(attachSession);
+app.use(securityMiddleware);
 
 // API Documentation Route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

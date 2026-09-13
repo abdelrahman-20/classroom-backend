@@ -9,8 +9,23 @@ export const attachSession = async (
   next: NextFunction,
 ) => {
   try {
+    const headers = { ...req.headers };
+    const cookies = headers.cookie?.split(";").map((cookie) => cookie.trim());
+    const hasAuthToken = cookies?.some((cookie) =>
+      cookie.startsWith("auth_token="),
+    );
+
+    // If the request has no auth_token but has the legacy authentication_token, we will use it to get the session.
+    // const legacyToken = cookies
+    //   ?.find((cookie) => cookie.startsWith("authentication_token="))
+    //   ?.slice("authentication_token=".length);
+
+    // if (!hasAuthToken && legacyToken) {
+    //   headers.cookie = `auth_token=${legacyToken}`;
+    // }
+
     const session = await auth.api.getSession({
-      headers: fromNodeHeaders(req.headers),
+      headers: fromNodeHeaders(headers),
     });
 
     if (session?.user) {
