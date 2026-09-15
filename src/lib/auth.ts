@@ -48,6 +48,11 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+  rateLimit: {
+    enabled: process.env.NODE_ENV !== "test",
+    window: 10,
+    max: 200,
+  },
   emailAndPassword: {
     enabled: true,
   },
