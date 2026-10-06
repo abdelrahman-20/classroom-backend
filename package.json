@@ -19,6 +19,8 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "module": "NodeNext",
+  "moduleResolution": "NodeNext",
   "bugs": {
     "url": "https://github.com/abdelrahman-20/classroom-backend/issues"
   },

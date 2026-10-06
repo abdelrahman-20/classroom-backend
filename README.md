@@ -90,22 +90,21 @@ GITHUB_CLIENT_ID="your-github-client-id"
 GITHUB_CLIENT_SECRET="your-github-client-secret"
 ```
 
-For the Railway deployment, add these variables in the Railway service's
-**Variables** tab, then redeploy the service. The endpoint
+For deployment, add the same environment variables in your hosting provider's
+settings dashboard and redeploy the backend. The endpoint
 `POST /api/auth/sign-in/social` is registered by the backend, but Better Auth
 returns `PROVIDER_NOT_FOUND` when the requested provider is not configured.
 
-Register these OAuth callback URLs with the provider you enable:
+Register the OAuth callback URLs for each provider you enable using your
+production backend URL, for example:
 
 ```text
-Google: https://classroom-backend-production-30b3.up.railway.app/api/auth/callback/google
-GitHub: https://classroom-backend-production-30b3.up.railway.app/api/auth/callback/github
+Google: https://your-backend-domain.com/api/auth/callback/google
+GitHub: https://your-backend-domain.com/api/auth/callback/github
 ```
 
-Also set `FRONTEND_URL` in Railway to the deployed frontend origin, for
-example `https://classroom-frontend-one-iota.vercel.app`, and set the
-frontend deployment's `VITE_BACKEND_URL` to
-`https://classroom-backend-production-30b3.up.railway.app` (or the same URL
+Set `FRONTEND_URL` to your deployed frontend origin and set the frontend
+deployment's `VITE_BACKEND_URL` to the deployed backend URL (or the same URL
 with `/api`; both forms are normalized by the frontend).
 
 Run database migrations:

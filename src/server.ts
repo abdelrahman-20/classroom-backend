@@ -112,3 +112,5 @@ server.on("error", (err: Error) => {
   console.error("Server error:", err);
   process.exit(1);
 });
+
+export default app;
