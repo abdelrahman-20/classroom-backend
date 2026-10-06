@@ -27,6 +27,7 @@
     "@arcjet/inspect": "^1.11.0",
     "@arcjet/node": "^1.11.0",
     "@neondatabase/serverless": "^1.1.0",
+    "@types/node": "^26.2.0",
     "apminsight": "^5.5.1",
     "better-auth": "^1.7.2",
     "cors": "^2.8.6",
@@ -39,7 +40,6 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.2.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "drizzle-kit": "^1.0.0-rc.4",
