@@ -27,6 +27,18 @@ const socialProviders = {
     : {}),
 };
 
+  const configuredSocialProviders = Object.keys(socialProviders);
+
+  if (configuredSocialProviders.length === 0) {
+    console.warn(
+      "No social auth providers are configured. Set a complete client ID and client secret pair for Google and/or GitHub.",
+    );
+  } else {
+    console.log(
+      `Configured social auth providers: ${configuredSocialProviders.join(", ")}`,
+    );
+  }
+
 const trustedOrigins = [
   process.env.FRONTEND_URL,
   "https://classroom-frontend-one-iota.vercel.app",

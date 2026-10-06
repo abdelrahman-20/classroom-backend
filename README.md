@@ -13,12 +13,12 @@ A full-stack classroom management application for organizing departments, subjec
 
 ## Tech Stack
 
-| Layer    | Technologies |
-| -------- | ------------ |
+| Layer    | Technologies                                                |
+| -------- | ----------------------------------------------------------- |
 | Frontend | React 19, Refine, Vite, TypeScript, Tailwind CSS, shadcn/ui |
-| Backend  | Express 5, TypeScript, Drizzle ORM, Better Auth |
-| Database | PostgreSQL (Neon serverless) |
-| Tooling  | Drizzle Kit, Swagger, Cloudinary |
+| Backend  | Express 5, TypeScript, Drizzle ORM, Better Auth             |
+| Database | PostgreSQL (Neon serverless)                                |
+| Tooling  | Drizzle Kit, Swagger, Cloudinary                            |
 
 ## Project Structure
 
@@ -83,11 +83,30 @@ BETTER_AUTH_SECRET="your-secret-key-here"
 BETTER_AUTH_URL="http://localhost:8000"
 
 # Optional social login providers
+# Social login providers (set each provider's ID and secret together)
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 GITHUB_CLIENT_ID="your-github-client-id"
 GITHUB_CLIENT_SECRET="your-github-client-secret"
 ```
+
+For the Railway deployment, add these variables in the Railway service's
+**Variables** tab, then redeploy the service. The endpoint
+`POST /api/auth/sign-in/social` is registered by the backend, but Better Auth
+returns `PROVIDER_NOT_FOUND` when the requested provider is not configured.
+
+Register these OAuth callback URLs with the provider you enable:
+
+```text
+Google: https://classroom-backend-production-30b3.up.railway.app/api/auth/callback/google
+GitHub: https://classroom-backend-production-30b3.up.railway.app/api/auth/callback/github
+```
+
+Also set `FRONTEND_URL` in Railway to the deployed frontend origin, for
+example `https://classroom-frontend-one-iota.vercel.app`, and set the
+frontend deployment's `VITE_BACKEND_URL` to
+`https://classroom-backend-production-30b3.up.railway.app` (or the same URL
+with `/api`; both forms are normalized by the frontend).
 
 Run database migrations:
 
@@ -135,38 +154,38 @@ The dashboard will be available at **http://localhost:5173**.
 
 ### Backend (`classroom-backend`)
 
-| Command            | Description                          |
-| ------------------ | ------------------------------------ |
-| `npm run dev`      | Start dev server with hot reload     |
-| `npm run build`    | Compile TypeScript to `dist/`        |
-| `npm start`        | Run the compiled production server   |
-| `npm run db:generate` | Generate a new Drizzle migration  |
-| `npm run db:migrate`  | Apply pending migrations          |
+| Command               | Description                        |
+| --------------------- | ---------------------------------- |
+| `npm run dev`         | Start dev server with hot reload   |
+| `npm run build`       | Compile TypeScript to `dist/`      |
+| `npm start`           | Run the compiled production server |
+| `npm run db:generate` | Generate a new Drizzle migration   |
+| `npm run db:migrate`  | Apply pending migrations           |
 
 ### Frontend (`classroom-frontend`)
 
-| Command         | Description                        |
-| --------------- | ---------------------------------- |
-| `npm run dev`   | Start Vite dev server              |
+| Command         | Description                         |
+| --------------- | ----------------------------------- |
+| `npm run dev`   | Start Vite dev server               |
 | `npm run build` | Type-check and build for production |
-| `npm start`     | Serve the production build         |
+| `npm start`     | Serve the production build          |
 
 ## API Endpoints
 
-| Method | Endpoint         | Description                              |
-| ------ | ---------------- | ---------------------------------------- |
-| GET    | `/`              | Health check                             |
-| GET    | `/api/subjects`  | List subjects (search, filter, paginate) |
-| GET    | `/api-docs`      | Swagger API documentation                |
+| Method | Endpoint        | Description                              |
+| ------ | --------------- | ---------------------------------------- |
+| GET    | `/`             | Health check                             |
+| GET    | `/api/subjects` | List subjects (search, filter, paginate) |
+| GET    | `/api-docs`     | Swagger API documentation                |
 
 ### Subjects query parameters
 
-| Parameter    | Type    | Description                              |
-| ------------ | ------- | ---------------------------------------- |
-| `search`     | string  | Filter by subject name or code           |
-| `department` | string  | Filter by department name or ID          |
-| `page`       | integer | Page number (default: `1`)               |
-| `limit`      | integer | Items per page, max 100 (default: `10`)  |
+| Parameter    | Type    | Description                             |
+| ------------ | ------- | --------------------------------------- |
+| `search`     | string  | Filter by subject name or code          |
+| `department` | string  | Filter by department name or ID         |
+| `page`       | integer | Page number (default: `1`)              |
+| `limit`      | integer | Items per page, max 100 (default: `10`) |
 
 ## Database Schema
 
